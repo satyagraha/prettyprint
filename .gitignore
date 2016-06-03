@@ -1,5 +1,6 @@
 *.class
 *.log
+.*.md.html
 
 # sbt specific
 .cache
@@ -16,6 +17,7 @@ project/plugins/project/
 .scala_dependencies
 .worksheet
 .cache-main
+.cache-tests
 .classpath
 .project
 .settings/**

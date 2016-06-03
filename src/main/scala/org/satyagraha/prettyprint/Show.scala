@@ -15,22 +15,26 @@ object Show extends LabelledTypeClassCompanion[Show] {
 
   implicit class Enricher[T](val t: T) extends AnyVal {
 
-    def pretty(implicit p: Show[T]): String = pretty("")(p)
+    def pretty(implicit p: Show[T]): String = pretty(None)(p)
 
-    def pretty(prefix: String)(implicit p: Show[T]): String = {
-      val prefixes = if (prefix.nonEmpty) Seq(prefix) else Seq()
-      val shown = p.show(t, prefixes)
-      shown map { case (repr, prefixes) => prefixes.mkString(".") + " : " + repr } mkString (", ")
-    }
+    def pretty(prefix: String)(implicit p: Show[T]): String = pretty(Some(prefix))(p)
+
+    def pretty(prefixOption: Option[String])(implicit p: Show[T]): String =
+      prettySeq(prefixOption)(p) map { case (repr, prefixes) => prefixes.mkString(".") + " : " + repr } mkString (", ")
+
+    def prettySeq(prefixOption: Option[String])(implicit p: Show[T]): Seq[(String, Seq[String])] =
+      p.show(t, prefixOption.toSeq)
 
   }
 
-  implicit val showInt = new Show[Int] {
-    override def show(value: Int, prefixes: Seq[String]) =
+  def showToString[T] = new Show[T] {
+    override def show(value: T, prefixes: Seq[String]) =
       Seq((value.toString, prefixes))
   }
 
-  implicit val showString = new Show[String] {
+  implicit val showInt = showToString[Int]
+  
+  implicit val showString = new Show[String] { 
     override def show(value: String, prefixes: Seq[String]) =
       Seq((value, prefixes))
   }
